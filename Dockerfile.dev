@@ -1,0 +1,17 @@
+# Development Dockerfile for OvenPlayer
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Expose port for development server
+EXPOSE 8080 3000
+
+# Default command for development
+CMD ["npm", "run", "watch"]
