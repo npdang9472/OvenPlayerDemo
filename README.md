@@ -76,3 +76,98 @@ Would you please click on each link below for details:
 * ["JavaScript-based Live Streaming Encoder" **OvenLiveKit**](https://github.com/AirenSoft/OvenLiveKit-Web)
 * ["Sub-Second Latency Streaming Server with LLHLS and WebRTC" **OvenMediaEngine**](https://github.com/AirenSoft/OvenMediaEngine)
 * ["JavaScript-based Player with LLHLS and WebRTC" **OvenPlayer**](https://github.com/AirenSoft/OvenPlayer)
+
+## How to run this source code
+
+Below are several reliable ways to run and test this repo on Windows (PowerShell). Pick the one that fits your workflow.
+
+### Prerequisites
+- Node.js 16+ and npm
+- Optional: Docker Desktop (for the Docker/Docker Compose options)
+
+### 1 Quick start (development watch)
+This runs webpack in development watch mode and serves files locally so you can iterate quickly.
+
+```powershell
+npm install
+npm run dev
+npx http-server -p 8080
+```
+
+Open: http://localhost:8080/demo/demo.html
+
+Notes:
+- The demo page loads OvenPlayer from a CDN by default. To test your local build, change the script tag in `demo/demo.html` to use your local bundle:
+  - Development build: `/dev/ovenplayer.js`
+  - Production build: `/dist/ovenplayer.js`
+
+### 2 Build once for production and serve
+Creates a production bundle in `dist/` and serves the repo via a static server.
+
+```powershell
+npm install
+npm run build
+npx http-server -p 8080
+```
+
+Open: http://localhost:8080/demo/demo.html
+
+### 3 Direct webpack commands (optional)
+Run webpack yourself without npm scripts.
+
+```powershell
+# Development (watch -> outputs to ./dev)
+npx webpack --config webpack.development.js --watch
+
+# Production (single build -> outputs to ./dist)
+npx webpack --config webpack.config.js
+```
+
+### 4 Docker: production image (nginx)
+Build and run a production container that serves `dist`, `demo`, and assets via nginx.
+
+```powershell
+docker build -t ovenplayer:local .
+docker run --rm -p 8080:80 ovenplayer:local
+```
+
+Open: http://localhost:8080/ (auto-redirects to `/demo/demo.html`)
+
+### 5 Docker Compose profiles
+- Development (webpack watch + static nginx):
+
+```powershell
+docker compose --profile development up --build
+```
+
+Open: http://localhost:8082/demo/demo.html
+
+- Production (prebuilt image from Docker Hub):
+
+```powershell
+docker compose --profile production up -d
+```
+
+Open: http://localhost/
+
+### 6 Framework demo packages (optional)
+Run the React and Vue 3 demo packages in `packages/` with Vite.
+
+```powershell
+# React
+cd packages/react
+npm install
+npm run dev
+
+# Vue 3 (in a new terminal or after stopping React)
+cd ../../packages/vue3
+npm install
+npm run dev
+```
+
+Open the URL printed by Vite (e.g., http://localhost:5173).
+
+### Troubleshooting
+- Port already in use: change `-p 8080` to another port (e.g., `-p 8081`).
+- "Missing script: dev": ensure your root `package.json` has a `dev` script that runs the webpack watch (e.g., `npm run watch`). You can also use `npx webpack --config webpack.development.js --watch` directly.
+- Windows path or permission issues with Docker volumes: ensure file sharing is enabled for the drive in Docker Desktop settings.
